@@ -1,0 +1,23 @@
+# Excel files
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+
+# MATLAB files
+*.m
+*.mat
+*.asv
+
+# Data files
+*.pkl
+*.pickle
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
