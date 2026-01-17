@@ -216,3 +216,47 @@ plt.show()
 df_multilevel = df_wide.copy()
 sns.lmplot(x='FC_rs_T1', y='FC_rs_T2', hue='zyg', data=df_multilevel)
 plt.title("pairwise linear regression by zygosity (124 Complete Pairs)", fontsize=14, fontweight='bold')
+
+# ===== Correlation Plot by Zygosity (Side-by-side) =====
+from scipy.stats import pearsonr
+
+# Separate by zygosity
+mz_data_corr = df_wide[df_wide['zyg'] == 'MZ']
+dz_data_corr = df_wide[df_wide['zyg'] == 'DZ']
+
+# Calculate correlations and fit lines
+mz_corr, mz_pval = pearsonr(mz_data_corr['FC_rs_T1'], mz_data_corr['FC_rs_T2'])
+dz_corr, dz_pval = pearsonr(dz_data_corr['FC_rs_T1'], dz_data_corr['FC_rs_T2'])
+
+# Fit lines for regression
+mz_z = np.polyfit(mz_data_corr['FC_rs_T1'], mz_data_corr['FC_rs_T2'], 1)
+mz_p = np.poly1d(mz_z)
+
+dz_z = np.polyfit(dz_data_corr['FC_rs_T1'], dz_data_corr['FC_rs_T2'], 1)
+dz_p = np.poly1d(dz_z)
+
+# Create figure with two subplots
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# MZ plot
+axes[0].scatter(mz_data_corr['FC_rs_T1'], mz_data_corr['FC_rs_T2'], alpha=0.6, s=80, color='#1f77b4', edgecolors='black', linewidth=0.5)
+x_range = np.linspace(mz_data_corr['FC_rs_T1'].min(), mz_data_corr['FC_rs_T1'].max(), 100)
+axes[0].plot(x_range, mz_p(x_range), 'r-', linewidth=2, label='Regression line')
+axes[0].set_xlabel('FC_rs_T1 (z-scores)', fontsize=12, fontweight='bold')
+axes[0].set_ylabel('FC_rs_T2 (z-scores)', fontsize=12, fontweight='bold')
+axes[0].set_title(f'Monozygotes (MZ)\nN = {len(mz_data_corr)}, r = {mz_corr:.4f}, p < 0.001', fontsize=13, fontweight='bold')
+axes[0].grid(True, alpha=0.3)
+axes[0].legend()
+
+# DZ plot
+axes[1].scatter(dz_data_corr['FC_rs_T1'], dz_data_corr['FC_rs_T2'], alpha=0.6, s=80, color='#ff7f0e', edgecolors='black', linewidth=0.5)
+x_range = np.linspace(dz_data_corr['FC_rs_T1'].min(), dz_data_corr['FC_rs_T1'].max(), 100)
+axes[1].plot(x_range, dz_p(x_range), 'r-', linewidth=2, label='Regression line')
+axes[1].set_xlabel('FC_rs_T1 (z-scores)', fontsize=12, fontweight='bold')
+axes[1].set_ylabel('FC_rs_T2 (z-scores)', fontsize=12, fontweight='bold')
+axes[1].set_title(f'Dizygotes (DZ)\nN = {len(dz_data_corr)}, r = {dz_corr:.4f}, p = 0.101', fontsize=13, fontweight='bold')
+axes[1].grid(True, alpha=0.3)
+axes[1].legend()
+
+plt.tight_layout()
+plt.show()
