@@ -2,7 +2,7 @@ require(umx)
 library(readxl)
 
 # Load your wide-format twin dataset
-twinData <- read_excel("C:/Users/busat/Desktop/PP/practical_project_2/data/twin_wide_FC_rs_zscores_corrected.xlsx")
+twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/twin_wide_FC_rs_zscores_corrected.xlsx")
 
 # Treat DV as numeric
 twinData$FC_rs_T1 <- as.numeric(trimws(twinData$FC_rs_T1))
