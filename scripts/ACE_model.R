@@ -57,50 +57,15 @@ mod_ade_ae <- umxModify(mod_ade, update = "c_r1c1", name = "ADE_AE")
 # E (drop A and D)
 mod_ade_e <- umxModify(mod_ade_ae, update = "a_r1c1", name = "ADE_E")
 
+#models_ACE <- list(mod_ace, mod_ae, mod_ce, mod_e)
+#models_ADE <- list(mod_ade, mod_ade_ae, mod_ade_e, mod_de)
+
+models_final <- list(mod_ace, mod_ade)
 # ------------------------------
-# --- Compare all models
+# --- Compare models
 # ------------------------------
-all_models <- list(mod_ace, mod_ae, mod_ce, mod_e,
-                   mod_ade, mod_ade_ae, mod_de, mod_ade_e)
+summary(mod_ace)
+summary(mod_ade)
+umxCompare(models_final)
 
-umxCompare(all_models)
 
-# ------------------------------
-# --- Extract standardized variance components from best-fitting model
-# Replace 'best_model' with whichever fits best according to AIC/likelihood
-# ------------------------------
-best_model <- mod_ade  # <- example: ADE model is best
-
-# Extract paths
-a <- mxEval(top.a, best_model)
-d <- mxEval(top.c, best_model)  # D is stored in top.c
-e <- mxEval(top.e, best_model)
-
-# Compute variance
-A_var <- a^2
-D_var <- d^2
-E_var <- e^2
-
-total <- A_var + D_var + E_var
-
-# Standardized proportions
-var_props <- round(c(
-  A = A_var / total,
-  D = D_var / total,
-  E = E_var / total
-), 3)
-
-print("Proportion of variance explained by best-fitting model:")
-print(var_props)
-
-# ------------------------------
-# --- Optional: plot paths for best model
-# ------------------------------
-umxPlotACE(
-  best_model,
-  file = "BestModel_FC_rs",
-  std = TRUE,
-  means = FALSE,
-  digits = 2,
-  strip_zero = FALSE
-)
