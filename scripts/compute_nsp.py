@@ -5,6 +5,7 @@ from nsp import segint_component
 import pandas as pd
 import numpy as np
 from scipy import stats
+from network import NestedSpectralPartition
 
 basedir = Path(__file__).parent.parent
 
@@ -42,7 +43,7 @@ for fc_file in fc_files:
 
     for s in range(n_subjects):
         fc = FC_data[var_name][:,:,s] #aggiungi deepcoy()
-        np.fill_diagonal(fc,0)
+        #np.fill_diagonal(fc,0)
         clus_size, clus_num = hierarchichal_clustering(fc)
         #nsp_data[clus_size_key].append(clus_size)
         #nsp_data[clus_num_key].append(clus_num)
