@@ -30,7 +30,7 @@ twins = twins[twins["twin"].isin([1,2])]
 # Choose one phenotype to model (e.g., FC_rs)
 wide = twins.pivot_table(index=["Family_ID","zyg"], columns="twin", values="FC_rs").reset_index()
 wide = wide.dropna(subset=[1,2]).rename(columns={1:"FC_rs_T1", 2:"FC_rs_T2"})
-
+wide.to_excel(pathout / "nsp_balance_with_HCP_info_zscores_wide_all_FC.xlsx", index=False)
 #wide.to_csv(pathout / "twin_wide_FC_rs_zscores.csv", index=False)
 """
 THIS NEEDS TO BE CHANGED TO SAVE WIDE DF IF NEEDED LATER. RIGHT NOW COLUMNS 
