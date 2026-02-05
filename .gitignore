@@ -12,10 +12,11 @@
 # Data files
 *.pkl
 *.pickle
-*.__pycache__
+
 # OS files
 .DS_Store
 Thumbs.db
+__pycache__/
 
 # IDE
 .vscode/

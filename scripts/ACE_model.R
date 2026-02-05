@@ -5,7 +5,7 @@ require(umx)
 library(readxl)
 
 # Load data
-twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/twin_wide_FC_rs_zscores_corrected.xlsx")
+twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/balance_rs.xlsx")
 
 # Ensure numeric
 twinData$FC_rs_T1 <- as.numeric(trimws(twinData$FC_rs_T1))

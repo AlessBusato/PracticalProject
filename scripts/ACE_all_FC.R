@@ -4,7 +4,7 @@ library(stringr)
 
 # Load data
 
-twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/nsp_balance_with_HCP_info_zscores_wide_all_FC.xlsx")
+twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/balance_all_FC.xlsx")
 
 # Identify all FC variables (e.g., FC_rs_T1, FC_rs_T2, ...)
 fc_cols <- grep("^FC_.*_T[12]$", names(twinData), value = TRUE)
