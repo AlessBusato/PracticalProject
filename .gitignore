@@ -12,7 +12,7 @@
 # Data files
 *.pkl
 *.pickle
-
+*.__pycache__
 # OS files
 .DS_Store
 Thumbs.db
