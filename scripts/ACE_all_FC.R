@@ -2,9 +2,8 @@ require(umx)
 library(readxl)
 library(stringr)
 
-# ------------------------------
 # Load data
-# ------------------------------
+
 twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/nsp_balance_with_HCP_info_zscores_wide_all_FC.xlsx")
 
 # Identify all FC variables (e.g., FC_rs_T1, FC_rs_T2, ...)
@@ -20,9 +19,8 @@ twinData[fc_cols] <- lapply(twinData[fc_cols], function(x) as.numeric(trimws(x))
 dz <- subset(twinData, zyg == "DZ")
 mz <- subset(twinData, zyg == "MZ")
 
-# ------------------------------
 # Loop over phenotypes
-# ------------------------------
+
 for (pheno in phenotypes) {
   
   cat("\n=====================================\n")

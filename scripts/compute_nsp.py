@@ -5,17 +5,16 @@ from nsp import segint_component
 import pandas as pd
 import numpy as np
 from scipy import stats
-from network import NestedSpectralPartition
 
 basedir = Path(__file__).parent.parent
 
 pathin = basedir / "data"
 pathout = basedir / "nsp"
 
+# load FC matrices 
 fc_files = [fc for fc in pathin.iterdir() if fc.suffix.lower() == '.mat']
 
 FC_data = {}
-#nsp_data = {}
 nsp_balance = {}
 
 for fc_file in fc_files:
@@ -37,16 +36,11 @@ for fc_file in fc_files:
     clus_size_key = var_name + "_clus_size"
     clus_num_key  = var_name + "_clus_num"
 
-    #nsp_data[clus_size_key] = []
-    #nsp_data[clus_num_key]  = []
     nsp_balance[var_name] = []
 
     for s in range(n_subjects):
-        fc = FC_data[var_name][:,:,s] #aggiungi deepcoy()
-        #np.fill_diagonal(fc,0)
+        fc = FC_data[var_name][:,:,s] 
         clus_size, clus_num = hierarchichal_clustering(fc)
-        #nsp_data[clus_size_key].append(clus_size)
-        #nsp_data[clus_num_key].append(clus_num)
         hint,hseg = segint_component(fc, clus_size, clus_num)
         hbal = hint - hseg
         nsp_balance[var_name].append(hbal)
