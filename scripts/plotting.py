@@ -25,7 +25,7 @@ axes = axes.flatten()
 for idx, col in enumerate(fc_columns):
     axes[idx].hist(df_balance_simple[col], bins=20, color='skyblue', edgecolor='black', alpha=0.7)
     axes[idx].set_title(col, fontsize=12, fontweight='bold')
-    axes[idx].set_xlabel('hbal (z-scores)')
+    axes[idx].set_xlabel('Balance Coefficient (z-scores)')
     axes[idx].set_ylabel('Frequency')
     axes[idx].grid(axis='y', alpha=0.3)
 
@@ -39,7 +39,7 @@ plt.show()
 # ===== Twin Pair Comparison Plot =====
 
 # Load corrected wide format data with complete twin pairs
-df_wide = pd.read_excel(pathin / "twin_wide_FC_rs_zscores_corrected.xlsx")
+df_wide = pd.read_excel(pathin / "balance_rs.xlsx")
 
 # Reshape from wide to long format for plotting
 twin_pairs_list = []
@@ -242,9 +242,9 @@ fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 axes[0].scatter(mz_data_corr['FC_rs_T1'], mz_data_corr['FC_rs_T2'], alpha=0.6, s=80, color='#1f77b4', edgecolors='black', linewidth=0.5)
 x_range = np.linspace(mz_data_corr['FC_rs_T1'].min(), mz_data_corr['FC_rs_T1'].max(), 100)
 axes[0].plot(x_range, mz_p(x_range), 'r-', linewidth=2, label='Regression line')
-axes[0].set_xlabel('FC_rs_T1 (z-scores)', fontsize=12, fontweight='bold')
-axes[0].set_ylabel('FC_rs_T2 (z-scores)', fontsize=12, fontweight='bold')
-axes[0].set_title(f'Monozygotes (MZ)\nN = {len(mz_data_corr)}, r = {mz_corr:.4f}, p < 0.001', fontsize=13, fontweight='bold')
+axes[0].set_xlabel('Balance coefficient Twin pair 1 (z-score)', fontsize=12, fontweight='bold')
+axes[0].set_ylabel('Balance coefficient Twin pair 2 (z-score)', fontsize=12, fontweight='bold')
+axes[0].set_title(f'Monozygotes (MZ)\nN = {len(mz_data_corr)}, r = {mz_corr:.4f}', fontsize=13, fontweight='bold')
 axes[0].grid(True, alpha=0.3)
 axes[0].legend()
 
@@ -252,9 +252,9 @@ axes[0].legend()
 axes[1].scatter(dz_data_corr['FC_rs_T1'], dz_data_corr['FC_rs_T2'], alpha=0.6, s=80, color='#ff7f0e', edgecolors='black', linewidth=0.5)
 x_range = np.linspace(dz_data_corr['FC_rs_T1'].min(), dz_data_corr['FC_rs_T1'].max(), 100)
 axes[1].plot(x_range, dz_p(x_range), 'r-', linewidth=2, label='Regression line')
-axes[1].set_xlabel('FC_rs_T1 (z-scores)', fontsize=12, fontweight='bold')
-axes[1].set_ylabel('FC_rs_T2 (z-scores)', fontsize=12, fontweight='bold')
-axes[1].set_title(f'Dizygotes (DZ)\nN = {len(dz_data_corr)}, r = {dz_corr:.4f}, p = 0.101', fontsize=13, fontweight='bold')
+axes[1].set_xlabel('Balance coefficient Twin pair 1 (z-score)', fontsize=12, fontweight='bold')
+axes[1].set_ylabel('Balance coefficient Twin pair 2 (z-score)', fontsize=12, fontweight='bold')
+axes[1].set_title(f'Dizygotes (DZ)\nN = {len(dz_data_corr)}, r = {dz_corr:.4f}', fontsize=13, fontweight='bold')
 axes[1].grid(True, alpha=0.3)
 axes[1].legend()
 
