@@ -1,63 +1,53 @@
-
-# Twin modeling: ACE and ADE
-
 require(umx)
 library(readxl)
+library(stringr)
 
 # Load data
-twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/balance_rs.xlsx")
+
+twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/balance_all_FC.xlsx")
+
+# Identify all FC variables (e.g., FC_rs_T1, FC_rs_T2, ...)
+fc_cols <- grep("^FC_.*_T[12]$", names(twinData), value = TRUE)
+
+# Extract base phenotype names (FC_xxx)
+phenotypes <- unique(str_replace(fc_cols, "_T[12]$", ""))
 
 # Ensure numeric
-twinData$FC_rs_T1 <- as.numeric(trimws(twinData$FC_rs_T1))
-twinData$FC_rs_T2 <- as.numeric(trimws(twinData$FC_rs_T2))
+twinData[fc_cols] <- lapply(twinData[fc_cols], function(x) as.numeric(trimws(x)))
 
 # Subset by zygosity
 dz <- subset(twinData, zyg == "DZ")
 mz <- subset(twinData, zyg == "MZ")
 
-# ACE model
-mod_ace <- umxACE(
-  selDVs = "FC_rs",
-  sep    = "_T",
-  dzData = dz,
-  mzData = mz
-)
+# Loop over phenotypes
 
-# AE (drop C)
-mod_ae <- umxModify(mod_ace, update = "c_r1c1", name = "AE")
-
-# CE (drop A)
-mod_ce <- umxModify(mod_ace, update = "a_r1c1", name = "CE")
-
-# E (drop A and C)
-mod_e <- umxModify(mod_ae, update = "a_r1c1", name = "E")
-
-# ADE model
-mod_ade <- umxACE(
-  selDVs = "FC_rs",
-  sep    = "_T",
-  dzData = dz,
-  mzData = mz,
-  dzCr   = .25   # dominance correlation for DZ
-)
-
-# DE (drop A)
-mod_de <- umxModify(mod_ade, update = "a_r1c1", name = "DE")
-
-# AE for ADE (drop D)
-mod_ade_ae <- umxModify(mod_ade, update = "c_r1c1", name = "ADE_AE")
-
-# E (drop A and D)
-mod_ade_e <- umxModify(mod_ade_ae, update = "a_r1c1", name = "ADE_E")
-
-#models_ACE <- list(mod_ace, mod_ae, mod_ce, mod_e)
-#models_ADE <- list(mod_ade, mod_ade_ae, mod_ade_e, mod_de)
-
-models_final <- list(mod_ace, mod_ade)
-
-# Compare models
-summary(mod_ace)
-summary(mod_ade)
-umxCompare(models_final)
-
-
+for (pheno in phenotypes) {
+  
+  cat("\n=====================================\n")
+  cat("ACE path coefficients for:", pheno, "\n")
+  cat("=====================================\n")
+  
+  # Run ACE
+  mod_ace <- try(umxACE(
+    selDVs = pheno,
+    sep    = "_T",
+    dzData = dz,
+    mzData = mz
+  ), silent = TRUE)
+  
+  if (inherits(mod_ace, "try-error")) {
+    cat("Model failed for", pheno, "\n")
+    next
+  }
+  
+  # Extract standardized A, C, E
+  est <- umxSummary(mod_ace, returnStd = TRUE)
+  
+  a1 <- est$std$A[1,1]
+  c1 <- est$std$C[1,1]
+  e1 <- est$std$E[1,1]
+  
+  # Print in your desired format
+  cat(sprintf("| %-10s | %6.3f | %6.3f | %6.3f |\n",
+              pheno, a1, c1, e1))
+}
