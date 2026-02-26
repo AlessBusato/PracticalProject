@@ -5,6 +5,7 @@ import numpy as np
 import statsmodels.formula.api as smf
 import seaborn as sns
 import ptitprince as pt
+from scipy.stats import pearsonr, linregress
 
 basedir = Path(__file__).parent.parent
 pathin = basedir / "data"
@@ -217,46 +218,71 @@ df_multilevel = df_wide.copy()
 sns.lmplot(x='FC_rs_T1', y='FC_rs_T2', hue='zyg', data=df_multilevel)
 plt.title("pairwise linear regression by zygosity (124 Complete Pairs)", fontsize=14, fontweight='bold')
 
-# ===== Correlation Plot by Zygosity (Side-by-side) =====
-from scipy.stats import pearsonr
+# --- Identify FC base names automatically ---
+df = pd.read_excel(Path(pathin) / "balance_all_FC.xlsx")
 
-# Separate by zygosity
-mz_data_corr = df_wide[df_wide['zyg'] == 'MZ']
-dz_data_corr = df_wide[df_wide['zyg'] == 'DZ']
+fc_pairs = {}
 
-# Calculate correlations and fit lines
-mz_corr, mz_pval = pearsonr(mz_data_corr['FC_rs_T1'], mz_data_corr['FC_rs_T2'])
-dz_corr, dz_pval = pearsonr(dz_data_corr['FC_rs_T1'], dz_data_corr['FC_rs_T2'])
+for col in df.columns:
+    if col.endswith("_T1"):
+        base = col[:-3]
+        twin2_col = base + "_T2"
+        if twin2_col in df.columns:
+            fc_pairs[base] = (col, twin2_col)
 
-# Fit lines for regression
-mz_z = np.polyfit(mz_data_corr['FC_rs_T1'], mz_data_corr['FC_rs_T2'], 1)
-mz_p = np.poly1d(mz_z)
+n_fc = len(fc_pairs)
 
-dz_z = np.polyfit(dz_data_corr['FC_rs_T1'], dz_data_corr['FC_rs_T2'], 1)
-dz_p = np.poly1d(dz_z)
+# --- Create subplots ---
+ncols = 3
+nrows = int(np.ceil(n_fc / ncols))
 
-# Create figure with two subplots
-fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+fig, axes = plt.subplots(nrows, ncols, figsize=(5*ncols, 5*nrows))
+axes = axes.flatten()
 
-# MZ plot
-axes[0].scatter(mz_data_corr['FC_rs_T1'], mz_data_corr['FC_rs_T2'], alpha=0.6, s=80, color='#1f77b4', edgecolors='black', linewidth=0.5)
-x_range = np.linspace(mz_data_corr['FC_rs_T1'].min(), mz_data_corr['FC_rs_T1'].max(), 100)
-axes[0].plot(x_range, mz_p(x_range), 'r-', linewidth=2, label='Regression line')
-axes[0].set_xlabel('Balance coefficient Twin pair 1 (z-score)', fontsize=12, fontweight='bold')
-axes[0].set_ylabel('Balance coefficient Twin pair 2 (z-score)', fontsize=12, fontweight='bold')
-axes[0].set_title(f'Monozygotes (MZ)\nN = {len(mz_data_corr)}, r = {mz_corr:.4f}', fontsize=13, fontweight='bold')
-axes[0].grid(True, alpha=0.3)
-axes[0].legend()
+# --- Plot each FC ---
+for ax, (fc_name, (t1_col, t2_col)) in zip(axes, fc_pairs.items()):
+    
+    df_mz = df[df["zyg"] == "MZ"]
+    df_dz = df[df["zyg"] == "DZ"]
+    
+    # Scatter
+    ax.scatter(df_mz[t1_col], df_mz[t2_col], 
+               color="blue", alpha=0.7, label="MZ")
+    
+    ax.scatter(df_dz[t1_col], df_dz[t2_col], 
+               color="orange", alpha=0.7, label="DZ")
+    
+    # ----- MZ regression -----
+    slope_mz, intercept_mz, r_mz, _, _ = linregress(
+        df_mz[t1_col], df_mz[t2_col]
+    )
+    x_vals = np.linspace(df[t1_col].min(), df[t1_col].max(), 100)
+    ax.plot(x_vals, intercept_mz + slope_mz * x_vals,
+            color="blue", linewidth=2)
+    
+    # ----- DZ regression -----
+    slope_dz, intercept_dz, r_dz, _, _ = linregress(
+        df_dz[t1_col], df_dz[t2_col]
+    )
+    ax.plot(x_vals, intercept_dz + slope_dz * x_vals,
+            color="orange", linewidth=2)
+    
+    # Labels
+    ax.set_title(fc_name)
+    ax.set_xlabel("Twin 1")
+    ax.set_ylabel("Twin 2")
+    
+    ax.text(0.05, 0.95,
+            f"MZ: r={r_mz:.2f}"
+            f"DZ: r={r_dz:.2f}",
+            transform=ax.transAxes,
+            verticalalignment="top")
+    
+    ax.legend()
 
-# DZ plot
-axes[1].scatter(dz_data_corr['FC_rs_T1'], dz_data_corr['FC_rs_T2'], alpha=0.6, s=80, color='#ff7f0e', edgecolors='black', linewidth=0.5)
-x_range = np.linspace(dz_data_corr['FC_rs_T1'].min(), dz_data_corr['FC_rs_T1'].max(), 100)
-axes[1].plot(x_range, dz_p(x_range), 'r-', linewidth=2, label='Regression line')
-axes[1].set_xlabel('Balance coefficient Twin pair 1 (z-score)', fontsize=12, fontweight='bold')
-axes[1].set_ylabel('Balance coefficient Twin pair 2 (z-score)', fontsize=12, fontweight='bold')
-axes[1].set_title(f'Dizygotes (DZ)\nN = {len(dz_data_corr)}, r = {dz_corr:.4f}', fontsize=13, fontweight='bold')
-axes[1].grid(True, alpha=0.3)
-axes[1].legend()
+# Remove unused axes
+for i in range(len(fc_pairs), len(axes)):
+    fig.delaxes(axes[i])
 
 plt.tight_layout()
 plt.show()
