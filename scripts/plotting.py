@@ -240,6 +240,15 @@ fig, axes = plt.subplots(nrows, ncols, figsize=(5*ncols, 5*nrows))
 axes = axes.flatten()
 
 # --- Plot each FC ---
+title_map = {
+    "FC_gamb": "Gambling Balance",
+    "FC_lang": "Language Balance",
+    "FC_motor": "Motor Balance",
+    "FC_rs": "Resting State Balance",
+    "FC_social": "Social Balance",
+    "FC_wm": "Working Memory Balance"
+}
+
 for ax, (fc_name, (t1_col, t2_col)) in zip(axes, fc_pairs.items()):
     
     df_mz = df[df["zyg"] == "MZ"]
@@ -268,15 +277,15 @@ for ax, (fc_name, (t1_col, t2_col)) in zip(axes, fc_pairs.items()):
             color="orange", linewidth=2)
     
     # Labels
-    ax.set_title(fc_name)
+    ax.set_title(title_map.get(fc_name, fc_name))
     ax.set_xlabel("Twin 1")
     ax.set_ylabel("Twin 2")
     
     ax.text(0.05, 0.95,
-            f"MZ: r={r_mz:.2f}"
-            f"DZ: r={r_dz:.2f}",
+            f"MZ: r = {r_mz:.2f}\nDZ: r = {r_dz:.2f}",
             transform=ax.transAxes,
-            verticalalignment="top")
+            verticalalignment="top",
+            bbox=dict(boxstyle="round", facecolor="white", alpha=0.7))
     
     ax.legend()
 
