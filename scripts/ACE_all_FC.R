@@ -5,7 +5,6 @@ library(ggplot2)
 library(dplyr)
 
 # Load data
-
 twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/balance_all_FC.xlsx")
 
 # Identify all FC variables (e.g., FC_rs_T1, FC_rs_T2, ...)
@@ -31,7 +30,6 @@ results <- data.frame(
 )
 
 # Loop over phenotypes
-
 for (pheno in phenotypes) {
   
   cat("\n=====================================\n")
@@ -50,12 +48,13 @@ for (pheno in phenotypes) {
     cat("Model failed for", pheno, "\n")
     next
   }
+  
   # Extract standardized components
   A_std <- mod_ace$top$A_std$result[1, 1]
   C_std <- mod_ace$top$C_std$result[1, 1]
   E_std <- mod_ace$top$E_std$result[1, 1]
   
-  # Heritability (already standardized)
+  # Heritability
   h2 <- A_std / (A_std + C_std + E_std)
   
   # Save results
@@ -70,15 +69,33 @@ for (pheno in phenotypes) {
 
 print(results)
 
+# ---------------------------------------------------------
+# RENAME PHENOTYPES FOR PLOTTING
+# ---------------------------------------------------------
 
-# Reorder phenotypes by h2
-results <- results %>% 
-  arrange(h2) %>% 
-  mutate(phenotype = factor(phenotype, levels = phenotype))
+pretty_names <- c(
+  "FC_motor" = "motor balance",
+  "FC_gamb"  = "gambling balance",
+  "FC_social" = "social balance",
+  "FC_lang" = "language balance",
+  "FC_wm" = "working memory balance",
+  "FC_rs" = "resting state balance"
+)
 
-ggplot(results, aes(x = phenotype, y = h2)) +
+results$pretty_label <- pretty_names[results$phenotype]
+
+# Reorder by h2 using the pretty labels
+results <- results %>%
+  arrange(h2) %>%
+  mutate(pretty_label = factor(pretty_label, levels = pretty_label))
+
+# ---------------------------------------------------------
+# PLOT
+# ---------------------------------------------------------
+
+ggplot(results, aes(x = pretty_label, y = h2)) +
   geom_col(fill = "#4C72B0") +
-  geom_text(aes(label = round(h2, 2)), 
+  geom_text(aes(label = round(h2, 2)),
             vjust = -0.5, size = 3.5) +
   theme_minimal(base_size = 13) +
   theme(
@@ -89,11 +106,9 @@ ggplot(results, aes(x = phenotype, y = h2)) +
     axis.title = element_text(face = "bold")
   ) +
   labs(
-    title = "Heritability (h²) across phenotypes",
     x = "Phenotype",
     y = "Heritability (h²)"
   ) +
   ylim(0, max(results$h2) + 0.1)
 
 ggsave("C:/Users/busat/Desktop/PP/heritability_plot.png", width = 8, height = 5, dpi = 300)
-
