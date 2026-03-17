@@ -230,7 +230,22 @@ for col in df.columns:
         if twin2_col in df.columns:
             fc_pairs[base] = (col, twin2_col)
 
-n_fc = len(fc_pairs)
+# --- Desired order ---
+desired_order = [
+    "FC_motor",
+    "FC_gamb",
+    "FC_social",
+    "FC_lang",
+    "FC_wm",
+    "FC_rs"
+]
+
+# Keep only those that actually exist
+ordered_fc_pairs = {
+    key: fc_pairs[key] for key in desired_order if key in fc_pairs
+}
+
+n_fc = len(ordered_fc_pairs)
 
 # --- Create subplots ---
 ncols = 3
@@ -241,15 +256,15 @@ axes = axes.flatten()
 
 # --- Plot each FC ---
 title_map = {
-    "FC_gamb": "Gambling Balance",
-    "FC_lang": "Language Balance",
-    "FC_motor": "Motor Balance",
-    "FC_rs": "Resting State Balance",
-    "FC_social": "Social Balance",
-    "FC_wm": "Working Memory Balance"
+    "FC_gamb": "Balance measure Gambling Task",
+    "FC_lang": "Balance measure Language Task",
+    "FC_motor": "Balance measure Motor Task",
+    "FC_rs": "Balance measure Resting State",
+    "FC_social": "Balance measure Social Task",
+    "FC_wm": "Balance measure Working Memory Task"
 }
 
-for ax, (fc_name, (t1_col, t2_col)) in zip(axes, fc_pairs.items()):
+for ax, (fc_name, (t1_col, t2_col)) in zip(axes, ordered_fc_pairs.items()):
     
     df_mz = df[df["zyg"] == "MZ"]
     df_dz = df[df["zyg"] == "DZ"]
@@ -290,7 +305,7 @@ for ax, (fc_name, (t1_col, t2_col)) in zip(axes, fc_pairs.items()):
     ax.legend()
 
 # Remove unused axes
-for i in range(len(fc_pairs), len(axes)):
+for i in range(len(ordered_fc_pairs), len(axes)):
     fig.delaxes(axes[i])
 
 plt.tight_layout()

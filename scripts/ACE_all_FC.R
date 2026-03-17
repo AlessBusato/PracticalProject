@@ -74,12 +74,12 @@ print(results)
 # ---------------------------------------------------------
 
 pretty_names <- c(
-  "FC_motor" = "motor balance",
-  "FC_gamb"  = "gambling balance",
-  "FC_social" = "social balance",
-  "FC_lang" = "language balance",
-  "FC_wm" = "working memory balance",
-  "FC_rs" = "resting state balance"
+  "FC_motor" = "Balance Motor Task",
+  "FC_gamb"  = "Balance Gambling Task",
+  "FC_social" = "Balance social Task",
+  "FC_lang" = "Balance Language Task",
+  "FC_wm" = "Balance Working Memory Task",
+  "FC_rs" = "Balance Resting State"
 )
 
 results$pretty_label <- pretty_names[results$phenotype]
@@ -106,7 +106,7 @@ ggplot(results, aes(x = pretty_label, y = h2)) +
     axis.title = element_text(face = "bold")
   ) +
   labs(
-    x = "Phenotype",
+    x = "Endophenotype",
     y = "Heritability (h²)"
   ) +
   ylim(0, max(results$h2) + 0.1)
