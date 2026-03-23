@@ -5,7 +5,7 @@ library(ggplot2)
 library(dplyr)
 
 # Load data
-twinData <- read_excel("C:/Users/busat/Desktop/PP/prac_proj/data/balance_all_FC.xlsx")
+twinData <- read_excel("add_your_path_here/ACE_twinData.xlsx")
 
 # Identify all FC variables (e.g., FC_rs_T1, FC_rs_T2, ...)
 fc_cols <- grep("^FC_.*_T[12]$", names(twinData), value = TRUE)
@@ -111,4 +111,4 @@ ggplot(results, aes(x = pretty_label, y = h2)) +
   ) +
   ylim(0, max(results$h2) + 0.1)
 
-ggsave("C:/Users/busat/Desktop/PP/heritability_plot.png", width = 8, height = 5, dpi = 300)
+ggsave("add_your_path_here/heritability_plot.png", width = 8, height = 5, dpi = 300)
